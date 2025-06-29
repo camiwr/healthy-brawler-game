@@ -7,6 +7,12 @@ const canvasHeight = canvas.height;
 const floorHeight = 100;
 const gravity = 0.5;
 
+const keys = {
+  a: false,
+  d: false,
+  w: false
+};
+
 // Player base
 const player = {
   x: 100,
@@ -15,18 +21,41 @@ const player = {
   height: 90,
   velocityX: 0,
   velocityY: 0,
+  speed: 5,
+  jumpForce: -12,
   onGround: false,
   color: "blue",
 };
+
+// Movimentação do teclado
+document.addEventListener("keydown", (e) => {
+  if (e.key === "a" || e.key === "ArrowLeft") keys.a = true;
+  if (e.key === "d" || e.key === "ArrowRight") keys.d = true;
+  if ((e.key === "w" || e.key === "ArrowUp") && player.onGround) {
+    player.velocityY = player.jumpForce;
+    player.onGround = false;
+  }
+});
+
+document.addEventListener("keyup", (e) => {
+  if (e.key === "a" || e.key === "ArrowLeft") keys.a = false;
+  if (e.key === "d" || e.key === "ArrowRight") keys.d = false;
+});
 
 function update() {
   // Gravidade
   player.velocityY += gravity;
 
-  // Movimento vertical
+  // Movimento lateral
+  player.velocityX = 0;
+  if (keys.a) player.velocityX = -player.speed;
+  if (keys.d) player.velocityX = player.speed;
+
+  // Atualiza posição
+  player.x += player.velocityX;
   player.y += player.velocityY;
 
-  // Verifica chão
+  // Colisão com chão
   if (player.y + player.height >= canvasHeight - floorHeight) {
     player.y = canvasHeight - floorHeight - player.height;
     player.velocityY = 0;
@@ -34,11 +63,15 @@ function update() {
   } else {
     player.onGround = false;
   }
+
+  // Limites da tela
+  if (player.x < 0) player.x = 0;
+  if (player.x + player.width > canvasWidth) player.x = canvasWidth - player.width;
 }
 
 function draw() {
   // Fundo
-  ctx.fillStyle = "#a0e3f0"; // azul céu
+  ctx.fillStyle = "#a0e3f0";
   ctx.fillRect(0, 0, canvasWidth, canvasHeight);
 
   // Chão
