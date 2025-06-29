@@ -40,8 +40,19 @@ const enemy = {
     width: 50,
     height: 90,
     color: "red",
-    isAlive: true
+    velocityX: -2,
+    patrolLeft: 600,
+    patrolRight: 900,
+    isAlive: true,
+    isAttacking: false,
+    attackCooldown: false,
+    attackBox: {
+        offsetX: -40,
+        width: 40,
+        height: 40
+    }
 };
+
 
 
 // Movimentação do teclado
@@ -112,6 +123,40 @@ function update() {
             console.log("Inimigo atingido!");
         }
     }
+    if (enemy.isAlive) {
+        enemy.x += enemy.velocityX;
+
+        // Inverte a direção ao chegar nas bordas da patrulha
+        if (enemy.x <= enemy.patrolLeft || enemy.x + enemy.width >= enemy.patrolRight) {
+            enemy.velocityX *= -1;
+        }
+    }
+    const distancia = Math.abs(enemy.x - player.x);
+
+    if (distancia < 60 && !enemy.attackCooldown) {
+        enemy.isAttacking = true;
+        enemy.attackCooldown = true;
+
+        // Verifica se acertou o jogador
+        const attackBox = {
+            x: enemy.x + (enemy.attackBox.offsetX * (enemy.velocityX >= 0 ? 1 : -1)),
+            y: enemy.y + 20,
+            width: enemy.attackBox.width,
+            height: enemy.attackBox.height
+        };
+
+        if (retangulosColidem(attackBox, player)) {
+            playerHit();
+        }
+
+        setTimeout(() => {
+            enemy.isAttacking = false;
+        }, 200);
+
+        setTimeout(() => {
+            enemy.attackCooldown = false;
+        }, 1000);
+    }
 
 }
 
@@ -141,7 +186,29 @@ function draw() {
         ctx.fillRect(atkX, player.y + 20, player.attackBox.width, player.attackBox.height);
     }
 
+    if (enemy.isAttacking) {
+        ctx.fillStyle = "orange";
+        const atkX = enemy.x + (enemy.attackBox.offsetX * (enemy.velocityX >= 0 ? 1 : -1));
+        ctx.fillRect(atkX, enemy.y + 20, enemy.attackBox.width, enemy.attackBox.height);
+    }
+
+    ctx.fillStyle = "black";
+    ctx.font = "20px Arial";
+    ctx.fillText("❤️ Vidas: " + playerLives, 20, 30);
 }
+
+let playerLives = 3;
+
+function playerHit() {
+    if (playerLives > 0) {
+        playerLives--;
+        console.log("😵 Jogador atingido! Vidas restantes:", playerLives);
+    }
+    if (playerLives === 0) {
+        console.log("💀 Game Over!");
+    }
+}
+
 
 function gameLoop() {
     update();
