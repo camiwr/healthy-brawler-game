@@ -124,38 +124,41 @@ function update() {
         }
     }
     if (enemy.isAlive) {
-        enemy.x += enemy.velocityX;
+        // Persegue o jogador
+        const distanciaX = player.x - enemy.x;
 
-        // Inverte a direção ao chegar nas bordas da patrulha
-        if (enemy.x <= enemy.patrolLeft || enemy.x + enemy.width >= enemy.patrolRight) {
-            enemy.velocityX *= -1;
-        }
-    }
-    const distancia = Math.abs(enemy.x - player.x);
-
-    if (distancia < 60 && !enemy.attackCooldown) {
-        enemy.isAttacking = true;
-        enemy.attackCooldown = true;
-
-        // Verifica se acertou o jogador
-        const attackBox = {
-            x: enemy.x + (enemy.attackBox.offsetX * (enemy.velocityX >= 0 ? 1 : -1)),
-            y: enemy.y + 20,
-            width: enemy.attackBox.width,
-            height: enemy.attackBox.height
-        };
-
-        if (retangulosColidem(attackBox, player)) {
-            playerHit();
+        if (Math.abs(distanciaX) > 1) {
+            enemy.velocityX = distanciaX > 0 ? 1.5 : -1.5;
+            enemy.x += enemy.velocityX;
         }
 
-        setTimeout(() => {
-            enemy.isAttacking = false;
-        }, 200);
+        // Ataque quando estiver próximo
+        const distancia = Math.abs(enemy.x - player.x);
 
-        setTimeout(() => {
-            enemy.attackCooldown = false;
-        }, 1000);
+        if (distancia < 60 && !enemy.attackCooldown) {
+            enemy.isAttacking = true;
+            enemy.attackCooldown = true;
+
+            // Caixa de ataque
+            const attackBox = {
+                x: enemy.x + (enemy.attackBox.offsetX * (enemy.velocityX >= 0 ? 1 : -1)),
+                y: enemy.y + 20,
+                width: enemy.attackBox.width,
+                height: enemy.attackBox.height
+            };
+
+            if (retangulosColidem(attackBox, player)) {
+                playerHit();
+            }
+
+            setTimeout(() => {
+                enemy.isAttacking = false;
+            }, 200);
+
+            setTimeout(() => {
+                enemy.attackCooldown = false;
+            }, 1000);
+        }
     }
 
 }
