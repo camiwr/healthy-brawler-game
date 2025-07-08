@@ -5,7 +5,7 @@ export const inimigos = [
     width: 40,
     height: 80,
     color: "red",
-    speed: 0.7,
+    speed: 0.4,
     isAlive: true,
     isFlashing: false,
     attackCooldown: false,

@@ -138,15 +138,17 @@ export function gameLoop({ ctx, player, inimigos, alimentos, objetos, chave }) {
       }
     }
 
-    // Verifica vitória (somente se pegou a chave)
-    if (chave.coletada && !victory && !gameOver) {
+    // Verifica se jogador chegou ao final do mapa com a chave
+    const chegouNoFim = player.x + player.width >= worldWidth - 20;
+
+    if (chegouNoFim && chave.coletada && !victory && !gameOver) {
       victory = true;
     }
 
-    // Fim do mapa
-    if (player.x + player.width >= worldWidth - 20 && !fimDoMapa && !gameOver && !victory) {
-      fimDoMapa = true;
+    if (chegouNoFim && !chave.coletada && !fimDoMapa && !gameOver && !victory) {
+      fimDoMapa = true; // Só exibe aviso “chegou no fim” se estiver SEM a chave
     }
+
   }
 
   function draw() {
@@ -216,10 +218,10 @@ export function gameLoop({ ctx, player, inimigos, alimentos, objetos, chave }) {
       ctx.fillText("🎉 Parabéns! Você venceu a fase!", width / 2 - 250, height / 2);
     }
 
-    if (fimDoMapa) {
+    if (fimDoMapa && !chave.coletada) {
       ctx.fillStyle = "blue";
-      ctx.font = "36px Arial";
-      ctx.fillText("🌟 Você chegou ao fim do mapa!", width / 2 - 250, height / 2 + 50);
+      ctx.font = "24px Arial";
+      ctx.fillText("🚪 Você chegou à porta, mas precisa da chave 🗝️!", width / 2 - 230, height / 2 + 50);
     }
   }
 

@@ -21,6 +21,6 @@ document.querySelectorAll(".faseBtn").forEach(btn => {
     const fase = btn.dataset.fase;
     fasesScreen.style.display = "none";
     gameCanvas.style.display = "block";
-    iniciarFase(fase); // essa função está no game.js
+    iniciarFase(fase); 
   };
 });

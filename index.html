@@ -8,22 +8,27 @@
 </head>
 
 <body>
+  <!-- MENU PRINCIPAL -->
   <div id="mainMenu" class="screen">
-    <h1>Healthy Brawler</h1>
+    <h1>Healthy Brawler 🥦</h1>
+    <p>Derrote os inimigos e colete alimentos saudáveis!</p>
     <button id="startBtn">Começar</button>
   </div>
 
   <!-- TELA DE INSTRUÇÕES -->
   <div id="instructionsScreen" class="screen" style="display: none;">
     <h2>Como Jogar</h2>
-    <p>Use A/D ou ←/→ para andar.</p>
-    <p>W ou ↑ para pular.</p>
-    <p>Barra de espaço para atacar.</p>
-    <p>Evite ser atingido pelos inimigos e avance de fase!</p>
+    <ul>
+      <li>⬅️ ➡️ A/D: mover</li>
+      <li>⬆️ W: subir / movimentação vertical</li>
+      <li>Espaço: atacar</li>
+      <li>Evite os alimentos ruins (inimigos) e colete os saudáveis 🍏</li>
+      <li>O último inimigo droppa uma chave 🗝️ → pegue-a para vencer!</li>
+    </ul>
     <button id="toFasesBtn">Ir para Fases</button>
   </div>
 
-    <!-- TELA DE FASES -->
+  <!-- TELA DE FASES -->
   <div id="fasesScreen" class="screen" style="display: none;">
     <h2>Escolha uma Fase</h2>
     <div>
@@ -31,13 +36,12 @@
     </div>
   </div>
 
+  <!-- JOGO -->
   <canvas id="gameCanvas" width="1024" height="576" style="display: none;"></canvas>
   <button id="restartBtn" style="display: none;">Jogar novamente</button>
 
-
   <!-- SCRIPTS -->
   <script src="src/js/mainMenu.js"></script>
-  <script src="src/js/game.js"></script>
+  <script type="module" src="src/js/main.js"></script>
 </body>
-
 </html>
