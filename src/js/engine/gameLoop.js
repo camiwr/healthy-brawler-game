@@ -10,7 +10,7 @@ let gameOver = false;
 let victory = false;
 let fimDoMapa = false;
 
-export function gameLoop({ ctx, player, inimigos, alimentos, objetos }) {
+export function gameLoop({ ctx, player, inimigos, alimentos, objetos, chave }) {
   const width = ctx.canvas.width;
   const height = ctx.canvas.height;
 
@@ -30,7 +30,7 @@ export function gameLoop({ ctx, player, inimigos, alimentos, objetos }) {
     if (player.x < 0) player.x = 0;
     if (player.x + player.width > worldWidth) player.x = worldWidth - player.width;
 
-    // Colisão com objetos fixos
+    // Colisão com objetos
     for (const obj of objetos) {
       if (colidem(player, obj)) {
         const dx = (player.x + player.width / 2) - (obj.x + obj.width / 2);
@@ -58,6 +58,11 @@ export function gameLoop({ ctx, player, inimigos, alimentos, objetos }) {
       }
     }
 
+    // Coleta da chave
+    if (chave.visivel && !chave.coletada && colidem(player, chave)) {
+      chave.coletada = true;
+    }
+
     // Ataque do jogador
     if (keys.space && !player.attackCooldown) {
       player.isAttacking = true;
@@ -77,6 +82,12 @@ export function gameLoop({ ctx, player, inimigos, alimentos, objetos }) {
           enemy.isAlive = false;
           enemy.isFlashing = true;
           setTimeout(() => (enemy.isFlashing = false), 150);
+
+          if (enemy.isFinal) {
+            chave.x = enemy.x + enemy.width / 2 - chave.width / 2;
+            chave.y = enemy.y + enemy.height;
+            chave.visivel = true;
+          }
         }
       }
     }
@@ -127,12 +138,12 @@ export function gameLoop({ ctx, player, inimigos, alimentos, objetos }) {
       }
     }
 
-    // Verifica vitória (todos os inimigos derrotados)
-    if (inimigos.every(e => !e.isAlive)) {
+    // Verifica vitória (somente se pegou a chave)
+    if (chave.coletada && !victory && !gameOver) {
       victory = true;
     }
 
-    // Verifica fim do mapa
+    // Fim do mapa
     if (player.x + player.width >= worldWidth - 20 && !fimDoMapa && !gameOver && !victory) {
       fimDoMapa = true;
     }
@@ -160,6 +171,12 @@ export function gameLoop({ ctx, player, inimigos, alimentos, objetos }) {
         ctx.fillStyle = a.color;
         ctx.fillRect(a.x, a.y, a.width, a.height);
       }
+    }
+
+    // chave
+    if (chave.visivel && !chave.coletada) {
+      ctx.fillStyle = chave.color;
+      ctx.fillRect(chave.x, chave.y, chave.width, chave.height);
     }
 
     // inimigos
