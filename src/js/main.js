@@ -6,18 +6,26 @@ import { inimigos } from "./entities/enemy.js";
 import { alimentos } from "./entities/items.js";
 import { elementosDeCenario } from "./world/objects.js";
 import { chave } from "./entities/key.js";
+import { fase1 } from "./fases/fase1.js";
+import { fase2 } from "./fases/fase2.js";
 
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
+
+const fases = {
+  "1": fase1,
+  "2": fase2
+};
 
 // Ativa os controles do jogador
 setupControls();
 
 // Função global chamada ao clicar em uma fase
-window.iniciarFase = function (faseSelecionada) {
-  console.log(`Iniciando Fase ${faseSelecionada}...`);
+window.iniciarFase = function (faseId) {
+  const fase = fases[faseId];
 
-  // Esconde botão reiniciar se estiver visível
+  if (!fase) return alert("Fase não encontrada!");
+
   document.getElementById("restartBtn").style.display = "none";
 
   // Reinicia variáveis principais
@@ -44,5 +52,12 @@ window.iniciarFase = function (faseSelecionada) {
 
   // Mostra o canvas e inicia o jogo
   canvas.style.display = "block";
-  gameLoop({ ctx, player, inimigos, alimentos, objetos: elementosDeCenario, chave });
+ gameLoop({
+    ctx,
+    player,
+    objetos: fase.objetos,
+    alimentos: fase.alimentos,
+    inimigos: fase.inimigos,
+    chave: fase.chave
+  });
 };
