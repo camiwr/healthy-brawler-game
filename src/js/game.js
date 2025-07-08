@@ -114,6 +114,7 @@ function update() {
     if (player.y < minY) player.y = minY;
     if (player.y > maxY) player.y = maxY;
 
+
     // Verifica fim do mapa
     if (player.x + player.width >= worldWidth - 20 && !fimDoMapa && !gameOver && !victory) {
         fimDoMapa = true;
@@ -181,6 +182,36 @@ function update() {
         const maxEnemyY = floorBottom - enemy.height;
         if (enemy.y < minEnemyY) enemy.y = minEnemyY;
         if (enemy.y > maxEnemyY) enemy.y = maxEnemyY;
+
+        // Colisão do inimigo com objetos
+        for (const obj of elementosDeCenario) {
+            if (colidem(enemy, obj)) {
+                const dx = (enemy.x + enemy.width / 2) - (obj.x + obj.width / 2);
+                const dy = (enemy.y + enemy.height / 2) - (obj.y + obj.height / 2);
+
+                const widthSum = (enemy.width + obj.width) / 2;
+                const heightSum = (enemy.height + obj.height) / 2;
+
+                const crossWidth = widthSum - Math.abs(dx);
+                const crossHeight = heightSum - Math.abs(dy);
+
+                if (crossWidth > 0 && crossHeight > 0) {
+                    if (crossWidth < crossHeight) {
+                        if (dx > 0) {
+                            enemy.x += crossWidth;
+                        } else {
+                            enemy.x -= crossWidth;
+                        }
+                    } else {
+                        if (dy > 0) {
+                            enemy.y += crossHeight;
+                        } else {
+                            enemy.y -= crossHeight;
+                        }
+                    }
+                }
+            }
+        }
 
         // Ataque inimigo se encostar
         if (
