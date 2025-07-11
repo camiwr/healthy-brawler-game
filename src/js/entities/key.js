@@ -1,9 +1,9 @@
-export const chave = {
+export const keyItem = {
   x: null,
   y: null,
   width: 20,
   height: 20,
   color: "gold",
-  visivel: false,
-  coletada: false
+  visible: false,
+  collected: false
 };

@@ -1,20 +1,21 @@
-export const fase2 = {
-  objetos: [
-    { x: 500, y: 470 - 60, width: 50, height: 60, color: "#996633" }, // caixa grande
+// stage2.js
+export const stage2 = {
+  objects: [
+    { x: 500, y: 470 - 60, width: 50, height: 60, color: "#996633" },
     { x: 1100, y: 470 - 40, width: 30, height: 40, color: "#777" },
-    { x: 1700, y: 470 - 70, width: 40, height: 70, color: "#008000" }, // árvore alta
+    { x: 1700, y: 470 - 70, width: 40, height: 70, color: "#008000" },
     { x: 2000, y: 470 - 50, width: 70, height: 50, color: "#333" }
   ],
 
-  alimentos: [
-    { x: 600, y: 440, width: 20, height: 20, color: "orange", coletado: false },
-    { x: 950, y: 440, width: 20, height: 20, color: "orange", coletado: false },
-    { x: 1400, y: 440, width: 20, height: 20, color: "orange", coletado: false },
-    { x: 2100, y: 440, width: 20, height: 20, color: "orange", coletado: false },
-    { x: 2700, y: 440, width: 20, height: 20, color: "orange", coletado: false }
+  items: [
+    { x: 600, y: 440, width: 20, height: 20, color: "orange", collected: false },
+    { x: 950, y: 440, width: 20, height: 20, color: "orange", collected: false },
+    { x: 1400, y: 440, width: 20, height: 20, color: "orange", collected: false },
+    { x: 2100, y: 440, width: 20, height: 20, color: "orange", collected: false },
+    { x: 2700, y: 440, width: 20, height: 20, color: "orange", collected: false }
   ],
 
-  inimigos: [
+  enemies: [
     {
       x: 1000, y: 470 - 45, width: 40, height: 80,
       color: "pink", speed: 0.4, isAlive: true,
@@ -32,13 +33,13 @@ export const fase2 = {
     }
   ],
 
-  chave: {
+  keyItem: {
     x: null,
     y: null,
     width: 20,
     height: 20,
     color: "blue",
-    visivel: false,
-    coletada: false
+    visible: false,
+    collected: false
   }
 };

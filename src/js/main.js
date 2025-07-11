@@ -1,63 +1,86 @@
-// main.js
 import { setupControls } from "./engine/controls.js";
 import { gameLoop } from "./engine/gameLoop.js";
 import { player } from "./entities/player.js";
-import { inimigos } from "./entities/enemy.js";
-import { alimentos } from "./entities/items.js";
-import { elementosDeCenario } from "./world/objects.js";
-import { chave } from "./entities/key.js";
-import { fase1 } from "./fases/fase1.js";
-import { fase2 } from "./fases/fase2.js";
+import { enemies } from "./entities/enemy.js";
+import { items } from "./entities/items.js";
+import { sceneObjects } from "./world/objects.js";
+import { keyItem } from "./entities/key.js";
+import { stage1 } from "./stages/stage1.js";
+import { stage2 } from "./stages/stage2.js";
 
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
-const fases = {
-  "1": fase1,
-  "2": fase2
+const stages = {
+  "1": stage1,
+  "2": stage2
 };
 
-// Ativa os controles do jogador
+// Setup controls
 setupControls();
 
-// Função global chamada ao clicar em uma fase
-window.iniciarFase = function (faseId) {
-  const fase = fases[faseId];
+document.addEventListener("DOMContentLoaded", () => {
+  const resultScreen = document.getElementById("resultScreen");
+  const btnRestart = document.getElementById("btnRestart");
+  const btnStages = document.getElementById("btnStages");
+  const btnNext = document.getElementById("btnNext");
 
-  if (!fase) return alert("Fase não encontrada!");
+  btnRestart.onclick = () => {
+    resultScreen.style.display = "none";
+    document.getElementById("gameCanvas").style.display = "block";
+    window.startStage(window.currentStage);
+  };
 
-  document.getElementById("restartBtn").style.display = "none";
+  btnStages.onclick = () => {
+    resultScreen.style.display = "none";
+    document.getElementById("stageScreen").style.display = "block";
+    document.getElementById("gameCanvas").style.display = "none";
+  };
 
-  // Reinicia variáveis principais
+  btnNext.onclick = () => {
+    const next = String(parseInt(window.currentStage) + 1);
+    resultScreen.style.display = "none";
+    window.startStage(next);
+  };
+});
+
+window.startStage = function (stageId) {
+  const stage = stages[stageId];
+  if (!stage) return alert("Stage not found!");
+
+  window.currentStage = stageId;
+  document.getElementById("btnRestart").style.display = "none";
+
+  // Reset state
   player.x = 100;
   player.y = 470 - player.height;
   player.lives = 5;
   player.isAttacking = false;
   player.attackCooldown = false;
   player.isFlashing = false;
-  player.alimentosColetados = 0;
+  player.collectedItems = 0;
 
-  inimigos.forEach(e => {
+  enemies.forEach(e => {
     e.isAlive = true;
     e.attackCooldown = false;
     e.isFlashing = false;
   });
 
-  alimentos.forEach(a => (a.coletado = false));
+  items.forEach(i => (i.collected = false));
 
-  chave.x = null;
-  chave.y = null;
-  chave.coletada = false;
-  chave.visivel = false;
+  keyItem.x = null;
+  keyItem.y = null;
+  keyItem.collected = false;
+  keyItem.visible = false;
 
-  // Mostra o canvas e inicia o jogo
+  // Start game
   canvas.style.display = "block";
- gameLoop({
+  gameLoop({
     ctx,
     player,
-    objetos: fase.objetos,
-    alimentos: fase.alimentos,
-    inimigos: fase.inimigos,
-    chave: fase.chave
+    objects: stage.objects,
+    items: stage.items,
+    enemies: stage.enemies,
+    keyItem: stage.keyItem
   });
 };

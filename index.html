@@ -1,50 +1,61 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="en">
+
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Healthy Brawler</title>
   <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
-  <!-- MENU PRINCIPAL -->
+  <!-- MAIN MENU -->
   <div id="mainMenu" class="screen">
     <h1>Healthy Brawler 🥦</h1>
-    <p>Derrote os inimigos e colete alimentos saudáveis!</p>
-    <button id="startBtn">Começar</button>
+    <p>Defeat the enemies and collect healthy food!</p>
+    <button id="startBtn">Start</button>
   </div>
 
-  <!-- TELA DE INSTRUÇÕES -->
+  <!-- INSTRUCTIONS SCREEN -->
   <div id="instructionsScreen" class="screen" style="display: none;">
-    <h2>Como Jogar</h2>
+    <h2>How to Play</h2>
     <ul>
-      <li>⬅️ ➡️ A/D: mover</li>
-      <li>⬆️ W: subir / movimentação vertical</li>
-      <li>Espaço: atacar</li>
-      <li>Evite os alimentos ruins (inimigos) e colete os saudáveis 🍏</li>
-      <li>O último inimigo droppa uma chave 🗝️ → pegue-a para vencer!</li>
+      <li>⬅️ ➡️ A/D: move</li>
+      <li>⬆️ W: vertical movement</li>
+      <li>Space: attack</li>
+      <li>Avoid junk food enemies and collect healthy items 🍏</li>
+      <li>The final enemy drops a key 🗝️ → grab it to win!</li>
     </ul>
-    <button id="toFasesBtn">Ir para Fases</button>
+    <button id="toStagesBtn">Go to Stages</button>
   </div>
 
-  <!-- TELA DE FASES -->
-  <div id="fasesScreen" class="screen" style="display: none;">
-    <h2>Escolha uma Fase</h2>
+  <!-- STAGE SELECT -->
+  <div id="stageScreen" class="screen" style="display: none;">
+    <h2>Select a Stage</h2>
     <div>
-      <button class="faseBtn" data-fase="1">Fase 1: Frutas 🍎</button>
-      <button class="faseBtn" data-fase="2">Fase 2: Legumes 🥕</button>
-      <!-- Para futuras fases: -->
-      <!-- <button class="faseBtn" data-fase="3">Fase 3: Água 💧</button> -->
+      <button class="stageBtn" data-stage="1">Stage 1: Fruits 🍎</button>
+      <button class="stageBtn" data-stage="2">Stage 2: Veggies 🥕</button>
     </div>
   </div>
 
-  <!-- JOGO -->
-  <canvas id="gameCanvas" width="1024" height="576" style="display: none;"></canvas>
-  <button id="restartBtn" style="display: none;">Jogar novamente</button>
+  <!-- RESULT SCREEN -->
+  <div id="resultScreen" class="result">
+    <h2 id="resultTitle"></h2>
+    <p id="resultMessage"></p>
+    <div class="resultButtons">
+      <button id="btnRestart">🔁 Restart</button>
+      <button id="btnStages">⬅ Back to Stages</button>
+      <button id="btnNext" style="display: none;">➡ Next Stage</button>
+    </div>
+  </div>
+
+
+  <!-- GAME CANVAS -->
+  <canvas id="gameCanvas" width="1024" height="580" style="display: none;"></canvas>
 
   <!-- SCRIPTS -->
   <script src="src/js/mainMenu.js"></script>
   <script type="module" src="src/js/main.js"></script>
 </body>
+
 </html>

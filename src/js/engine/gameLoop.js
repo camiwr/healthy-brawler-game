@@ -1,23 +1,38 @@
 import { keys } from "./controls.js";
 import { colidem } from "./collision.js";
 import { updateCamera } from "./camera.js";
+import { drawBackground } from "../world/background.js";
 
 const worldWidth = 3000;
-const floorTop = 330;
-const floorBottom = 470;
+const floorTop = 240;
+const floorBottom = 580;
 
 let gameOver = false;
 let victory = false;
-let fimDoMapa = false;
+let reachedExit = false;
 
-export function gameLoop({ ctx, player, inimigos, alimentos, objetos, chave }) {
+export function gameLoop({ ctx, player, enemies, items, objects, keyItem }) {
   const width = ctx.canvas.width;
   const height = ctx.canvas.height;
 
-  function update() {
-    if (gameOver || victory || fimDoMapa) return;
+  function showResult(title, message, showNext = false) {
+    const resultScreen = document.getElementById("resultScreen");
+    const resultTitle = document.getElementById("resultTitle");
+    const resultMessage = document.getElementById("resultMessage");
+    const btnNext = document.getElementById("btnNext");
 
-    // Movimento do jogador
+    resultTitle.textContent = title;
+    resultMessage.textContent = message;
+    resultScreen.style.display = "flex";
+    document.getElementById("gameCanvas").style.display = "none";
+    btnNext.style.display = showNext ? "inline-block" : "none";
+  }
+
+
+  function update() {
+    if (gameOver || victory || reachedExit) return;
+
+    // Player movement
     if (keys.a) player.x -= player.speed;
     if (keys.d) player.x += player.speed;
     if (keys.w) player.y -= player.speed;
@@ -30,8 +45,8 @@ export function gameLoop({ ctx, player, inimigos, alimentos, objetos, chave }) {
     if (player.x < 0) player.x = 0;
     if (player.x + player.width > worldWidth) player.x = worldWidth - player.width;
 
-    // Colisão com objetos
-    for (const obj of objetos) {
+    // Collision with objects
+    for (const obj of objects) {
       if (colidem(player, obj)) {
         const dx = (player.x + player.width / 2) - (obj.x + obj.width / 2);
         const dy = (player.y + player.height / 2) - (obj.y + obj.height / 2);
@@ -50,20 +65,20 @@ export function gameLoop({ ctx, player, inimigos, alimentos, objetos, chave }) {
       }
     }
 
-    // Coleta de alimentos
-    for (const a of alimentos) {
-      if (!a.coletado && colidem(player, a)) {
-        a.coletado = true;
-        player.alimentosColetados++;
+    // Collect items
+    for (const item of items) {
+      if (!item.collected && colidem(player, item)) {
+        item.collected = true;
+        player.collectedItems++;
       }
     }
 
-    // Coleta da chave
-    if (chave.visivel && !chave.coletada && colidem(player, chave)) {
-      chave.coletada = true;
+    // Collect key
+    if (keyItem.visible && !keyItem.collected && colidem(player, keyItem)) {
+      keyItem.collected = true;
     }
 
-    // Ataque do jogador
+    // Player attack
     if (keys.space && !player.attackCooldown) {
       player.isAttacking = true;
       player.attackCooldown = true;
@@ -71,7 +86,7 @@ export function gameLoop({ ctx, player, inimigos, alimentos, objetos, chave }) {
       setTimeout(() => (player.isAttacking = false), 200);
       setTimeout(() => (player.attackCooldown = false), 600);
 
-      for (const enemy of inimigos) {
+      for (const enemy of enemies) {
         if (
           enemy.isAlive &&
           colidem(
@@ -84,16 +99,16 @@ export function gameLoop({ ctx, player, inimigos, alimentos, objetos, chave }) {
           setTimeout(() => (enemy.isFlashing = false), 150);
 
           if (enemy.isFinal) {
-            chave.x = enemy.x + enemy.width / 2 - chave.width / 2;
-            chave.y = enemy.y + enemy.height;
-            chave.visivel = true;
+            keyItem.x = enemy.x + enemy.width / 2 - keyItem.width / 2;
+            keyItem.y = enemy.y + enemy.height;
+            keyItem.visible = true;
           }
         }
       }
     }
 
-    // Movimento e ataque dos inimigos
-    for (const enemy of inimigos) {
+    // Enemy movement and attack
+    for (const enemy of enemies) {
       if (!enemy.isAlive) continue;
 
       const dx = player.x - enemy.x;
@@ -107,7 +122,7 @@ export function gameLoop({ ctx, player, inimigos, alimentos, objetos, chave }) {
       if (enemy.y < minY) enemy.y = minY;
       if (enemy.y > maxY) enemy.y = maxY;
 
-      for (const obj of objetos) {
+      for (const obj of objects) {
         if (colidem(enemy, obj)) {
           const dx = (enemy.x + enemy.width / 2) - (obj.x + obj.width / 2);
           const dy = (enemy.y + enemy.height / 2) - (obj.y + obj.height / 2);
@@ -138,17 +153,15 @@ export function gameLoop({ ctx, player, inimigos, alimentos, objetos, chave }) {
       }
     }
 
-    // Verifica se jogador chegou ao final do mapa com a chave
-    const chegouNoFim = player.x + player.width >= worldWidth - 20;
+    const atEnd = player.x + player.width >= worldWidth - 20;
 
-    if (chegouNoFim && chave.coletada && !victory && !gameOver) {
+    if (atEnd && keyItem.collected && !victory && !gameOver) {
       victory = true;
     }
 
-    if (chegouNoFim && !chave.coletada && !fimDoMapa && !gameOver && !victory) {
-      fimDoMapa = true; // Só exibe aviso “chegou no fim” se estiver SEM a chave
+    if (atEnd && !keyItem.collected && !reachedExit && !gameOver && !victory) {
+      reachedExit = true;
     }
-
   }
 
   function draw() {
@@ -157,39 +170,32 @@ export function gameLoop({ ctx, player, inimigos, alimentos, objetos, chave }) {
     ctx.save();
     ctx.translate(-cameraX, 0);
 
-    // chão
-    ctx.fillStyle = "#abc4ab";
-    ctx.fillRect(0, floorTop, worldWidth, floorBottom - floorTop);
+    drawBackground(ctx, cameraX, worldWidth, floorTop, floorBottom);
 
-    // objetos fixos
-    for (const obj of objetos) {
+    for (const obj of objects) {
       ctx.fillStyle = obj.color;
       ctx.fillRect(obj.x, obj.y, obj.width, obj.height);
     }
 
-    // alimentos
-    for (const a of alimentos) {
-      if (!a.coletado) {
-        ctx.fillStyle = a.color;
-        ctx.fillRect(a.x, a.y, a.width, a.height);
+    for (const item of items) {
+      if (!item.collected) {
+        ctx.fillStyle = item.color;
+        ctx.fillRect(item.x, item.y, item.width, item.height);
       }
     }
 
-    // chave
-    if (chave.visivel && !chave.coletada) {
-      ctx.fillStyle = chave.color;
-      ctx.fillRect(chave.x, chave.y, chave.width, chave.height);
+    if (keyItem.visible && !keyItem.collected) {
+      ctx.fillStyle = keyItem.color;
+      ctx.fillRect(keyItem.x, keyItem.y, keyItem.width, keyItem.height);
     }
 
-    // inimigos
-    for (const enemy of inimigos) {
+    for (const enemy of enemies) {
       if (enemy.isAlive) {
         ctx.fillStyle = enemy.isFlashing ? "#fff" : enemy.color;
         ctx.fillRect(enemy.x, enemy.y, enemy.width, enemy.height);
       }
     }
 
-    // player
     ctx.fillStyle = player.isFlashing ? "#fff" : player.color;
     ctx.fillRect(player.x, player.y, player.width, player.height);
 
@@ -203,32 +209,26 @@ export function gameLoop({ ctx, player, inimigos, alimentos, objetos, chave }) {
     // HUD
     ctx.fillStyle = "black";
     ctx.font = "20px Arial";
-    ctx.fillText("❤️ Vidas: " + player.lives, 20, 30);
-    ctx.fillText("🍏 Alimentos: " + player.alimentosColetados, width - 200, 30);
+    ctx.fillText("❤️ Lives: " + player.lives, 20, 30);
+    ctx.fillText("🍏 Items: " + player.collectedItems, width - 200, 30);
+
+    if (reachedExit && !keyItem.collected) {
+      showResult("🚪 Locked Door", "You need the key to complete the stage!");
+    }
 
     if (gameOver) {
-      ctx.fillStyle = "black";
-      ctx.font = "48px Arial";
-      ctx.fillText("GAME OVER", width / 2 - 150, height / 2);
+      showResult("💀 Game Over", "You were defeated by junk food.");
     }
 
     if (victory) {
-      ctx.fillStyle = "green";
-      ctx.font = "36px Arial";
-      ctx.fillText("🎉 Parabéns! Você venceu a fase!", width / 2 - 250, height / 2);
-    }
-
-    if (fimDoMapa && !chave.coletada) {
-      ctx.fillStyle = "blue";
-      ctx.font = "24px Arial";
-      ctx.fillText("🚪 Você chegou à porta, mas precisa da chave 🗝️!", width / 2 - 230, height / 2 + 50);
+      showResult("🏆 Victory!", "You collected the key and completed the stage!", true);
     }
   }
 
   function loop() {
     update();
     draw();
-    if (!gameOver && !victory && !fimDoMapa) requestAnimationFrame(loop);
+    if (!gameOver && !victory && !reachedExit) requestAnimationFrame(loop);
   }
 
   loop();

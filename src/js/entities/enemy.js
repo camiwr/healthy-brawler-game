@@ -1,4 +1,4 @@
-export const inimigos = [
+export const enemies = [
   {
     x: 900,
     y: 470 - 45,

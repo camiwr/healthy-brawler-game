@@ -9,5 +9,5 @@ export const player = {
   attackCooldown: false,
   isFlashing: false,
   lives: 3,
-  alimentosColetados: 0,
+  collectedItems: 0,
 };

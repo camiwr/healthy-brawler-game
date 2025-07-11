@@ -1,26 +1,26 @@
 const mainMenu = document.getElementById("mainMenu");
 const instructionsScreen = document.getElementById("instructionsScreen");
-const fasesScreen = document.getElementById("fasesScreen");
+const stageScreen = document.getElementById("stageScreen");
 const gameCanvas = document.getElementById("gameCanvas");
 
 const startBtn = document.getElementById("startBtn");
-const toFasesBtn = document.getElementById("toFasesBtn");
+const toStagesBtn = document.getElementById("toStagesBtn");
 
 startBtn.onclick = () => {
   mainMenu.style.display = "none";
   instructionsScreen.style.display = "block";
 };
 
-toFasesBtn.onclick = () => {
+toStagesBtn.onclick = () => {
   instructionsScreen.style.display = "none";
-  fasesScreen.style.display = "block";
+  stageScreen.style.display = "block";
 };
 
-document.querySelectorAll(".faseBtn").forEach(btn => {
+document.querySelectorAll(".stageBtn").forEach(btn => {
   btn.onclick = () => {
-    const fase = btn.dataset.fase;
-    fasesScreen.style.display = "none";
+    const stage = btn.dataset.stage;
+    stageScreen.style.display = "none";
     gameCanvas.style.display = "block";
-    iniciarFase(fase); 
+    startStage(stage);
   };
 });
